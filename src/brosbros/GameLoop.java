@@ -1,5 +1,8 @@
 package brosbros;
 
+import java.awt.Toolkit;
+import java.util.Properties;
+
 public class GameLoop extends Thread{
 
 	int nrOfPlayers = 3;
@@ -17,6 +20,14 @@ public class GameLoop extends Thread{
 	int nextLevelCounter = 0;
 	
 	public static void main(String[] args) throws Exception {
+		//Doesn't seem to work, as uiscale must be disabled before getScreenSize() is called
+		//int height = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+		//System.out.println("Screen height: "+height);
+		//if (height < 1300){ //Disable dpi scaling on windows on normal screens!
+			System.out.println("Disabling uiScale");
+			Properties props = System.getProperties();
+			props.setProperty("sun.java2d.uiScale.enabled","false");
+		//}
 		GameLoop gl = new GameLoop();
 		gl.start();
 	}

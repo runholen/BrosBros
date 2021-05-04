@@ -13,6 +13,9 @@ public class Intro extends Level{
 	public Intro(GameLoop gameLoop) throws Exception{
 		super(gameLoop,0);
 		this.loop = gameLoop;
+		if (GameFrame.isDeveloperPc()){
+			messages.add(new IntroMessage(0,60,"Java version: "+System.getProperty("java.version"),10,0,10,800,0,0,Color.gray));
+		}
 		messages.add(new IntroMessage(0,40,"BrosBros",45,0,500,-20,0,2,Color.gray));
 		messages.add(new IntroMessage(40,40,"Hi, I'm Frode",  16,1,-5,100,2,0,Color.black));
 		messages.add(new IntroMessage(80,40,"Hi, I'm Fritjof",16,2,-5,200,2,0,Color.black));

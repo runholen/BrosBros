@@ -51,7 +51,7 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 		setVisible(true);
 	}
 	
-	private boolean isDeveloperPc() {
+	public static boolean isDeveloperPc() {
 		try	{
 		    String name = InetAddress.getLocalHost().getHostName();
 		    System.out.println(name);
