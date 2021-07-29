@@ -33,8 +33,15 @@ public class GameObject {
 		}
 		return false;
 	}
-	public boolean enters(GameObject o) {
+	public boolean collidesWith2(GameObject o) {
+		if (x <= o.x + o.getWidth() && x + getWidth() >= o.x && y <= o.y + o.getHeight() && y + getHeight() >= o.y) {
+			return true;
+		}
+		return false;
+	}
+	public boolean enters(Level level, GameObject o) {
 		if (x < o.x + o.getWidth()/2 && x + getWidth()/2 > o.x && y < o.y + o.getHeight()/2 && y + getHeight()/2 > o.y) {
+			if (o instanceof Door && level != null && level.numberofkeys > 0) return false;
 			return true;
 		}
 		return false;

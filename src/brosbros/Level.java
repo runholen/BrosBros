@@ -13,6 +13,7 @@ public class Level {
 	int levelNr;
 	int startx, starty;
 	int doorx, doory;
+	int keyx, keyy;
 	int moreUp = 0;
 	int portal1x, portal1y;
 	int portal2x, portal2y;
@@ -20,8 +21,11 @@ public class Level {
 	byte[][] levelData;
 	boolean portalIsShowing = false;
 	boolean isUnderWater = false;
+	int numberofkeys = 0;
+	int bossx = 0; int bossy = 0;
+	int numberofBosses = 0;
 	Color backgroundColor = Color.white;
-	public static int maxLevels = 12;
+	public static int maxLevels = 15;
 	
 	public Level(GameLoop gameLoop, int level) throws Exception{
 		this.levelNr = level;
@@ -30,6 +34,7 @@ public class Level {
 		String fileName2 = null;
 		portalIsShowing = false;
 		isUnderWater = false;
+		numberofkeys = 0;
 		if (level == 0){
 			startx = -100;
 			starty = -100;
@@ -104,7 +109,6 @@ public class Level {
 			starty = GameFrame.height-330;
 			doorx = 1170;
 			doory = 600;
-			portalIsShowing = false;
 			fileName1 = "2-3.png";
 			fileName2 = "2-3.data";
 		}
@@ -113,7 +117,6 @@ public class Level {
 			starty = 620;
 			doorx = 1100;
 			doory = 100;
-			portalIsShowing = false;
 			fileName1 = "2-4.png";
 			fileName2 = "2-4.data";
 		}
@@ -122,7 +125,6 @@ public class Level {
 			starty = 70;
 			doorx = 1100;
 			doory = 800;
-			portalIsShowing = false;
 			fileName1 = "2-5.png";
 			fileName2 = "2-5.data";
 		}
@@ -131,7 +133,6 @@ public class Level {
 			starty = 20;
 			doorx = 530;
 			doory = 800;
-			portalIsShowing = false;
 			fileName1 = "3-1.png";
 			fileName2 = "3-1.data";
 		}
@@ -140,10 +141,42 @@ public class Level {
 			starty = 90;
 			doorx = 950;
 			doory = 530;
-			portalIsShowing = false;
 			isUnderWater  = true;
 			fileName1 = "3-2.png";
 			fileName2 = "3-2.data";
+		}
+		if (level == 13){
+			startx = 155;
+			starty = 590;
+			doorx = 1008;
+			doory = 460;
+			fileName1 = "3-3.png";
+			fileName2 = "3-3.data";
+		}
+		if (level == 14){
+			startx = 755;
+			starty = 80;
+			doorx = 50;
+			doory = 340;
+			keyx = 50;
+			keyy = 620;
+			fileName1 = "3-4.png";
+			fileName2 = "3-4.data";
+			numberofkeys = 1;
+		}
+		if (level == 15){
+			startx = 35;
+			starty = 80;
+			doorx = 30;
+			doory = 865;
+			keyx = 500;
+			keyy = 750;
+			numberofkeys = 1;
+			fileName1 = "3-5.png";
+			fileName2 = "3-5.data";
+			bossx = 40;
+			bossy = doory-55;
+			numberofBosses = 1;
 		}
 		if (fileName1 != null){
 			//Original is 608x472
@@ -174,11 +207,14 @@ public class Level {
 		}
 		gameLoop.door.x = doorx;
 		gameLoop.door.y = doory;
+		gameLoop.key.x = keyx;
+		gameLoop.key.y = keyy;
 		gameLoop.portal1.x = portal1x;
 		gameLoop.portal1.y = portal1y;
 		gameLoop.portal2.x = portal2x;
 		gameLoop.portal2.y = portal2y;
-		
+		gameLoop.boss1.x = bossx;
+		gameLoop.boss1.y = bossy;
 	}
 	public int getX(int playerNr){
 		int x = startx;

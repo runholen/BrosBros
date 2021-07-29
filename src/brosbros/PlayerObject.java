@@ -27,6 +27,9 @@ public class PlayerObject extends GameObject{
 	Collition previousCollition = null;
 	Collition ghostCollition = null;
 	int teleportCooldown = 0;
+	public static int max_hitpoints = 20;
+	int hitpoints = max_hitpoints;
+	
 	
 	BufferedImage swimming;
 	BufferedImage swimmingFlipped;

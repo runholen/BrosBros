@@ -23,7 +23,7 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 	BufferedImage buffer = new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
 	
 	public GameFrame(GameLoop gameLoop) throws Exception{
-		super("BrosBros v0.1.1");
+		super("BrosBros v0.1.2 snapshot 1");
 		BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/resources/"+"icon.png"));
 		setIconImage(img.getScaledInstance(64, 64, BufferedImage.SCALE_DEFAULT));
 		this.gameLoop = gameLoop;
@@ -136,6 +136,12 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 						if (gameLoop.level.isUnderWater) s = "(Blub)";
 						g.drawString(s, player.x+player.getWidth()/2-3, player.y-5);
 					}
+					if (gameLoop.level.numberofkeys > 0 && player.enters(null, gameLoop.door)){
+						g.setColor(Color.black);
+						g.setFont(g.getFont().deriveFont(Font.BOLD,(float)14));
+						g.drawString("The door is locked!", player.x+player.getWidth()/2-20, player.y-15);
+						g.drawString("We need a key!", player.x+player.getWidth()/2-20, player.y-5);
+					}
 					if (debugPanel.viewJumps.isSelected() && player.jumping){ //Debug
 						g.setColor(Color.black);
 						g.setFont(g.getFont().deriveFont(Font.BOLD,(float)14));
@@ -154,6 +160,17 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 			}
 			else{
 				g.drawImage(gameLoop.door.image,gameLoop.door.x,gameLoop.door.y,null);
+			}
+			if (gameLoop.level.numberofkeys == 1){
+				g.drawImage(gameLoop.key.image,gameLoop.key.x,gameLoop.key.y,null);
+			}
+			if (gameLoop.level.numberofBosses == 1){
+				if (gameLoop.boss1.useFlipped){
+					g.drawImage(gameLoop.boss1.flipped,gameLoop.boss1.x,gameLoop.boss1.y,null);
+				}
+				else{
+					g.drawImage(gameLoop.boss1.image,gameLoop.boss1.x,gameLoop.boss1.y,null);
+				}
 			}
 			if (gameLoop.level.portalIsShowing){
 				g.drawImage(gameLoop.portal1.image,gameLoop.portal1.x,gameLoop.portal1.y,null);
@@ -250,15 +267,17 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 	public class DebugPanel extends JPanel implements ActionListener{
 		JButton next = new JButton("Neste");
 		JButton previous = new JButton("Forrige");
+		JButton last = new JButton("Siste");
 		JCheckBox overlay = new JCheckBox("Vis bakgrunn",false);
 		JCheckBox viewCollitions = new JCheckBox("Vis kollisjoner",false);
 		JCheckBox viewJumps = new JCheckBox("Vis hopp",false);
 		public DebugPanel(){
 			setLayout(new BorderLayout());
 			JPanel north = new JPanel();
-			north.setLayout(new GridLayout(6,1));
+			north.setLayout(new GridLayout(7,1));
 			north.add(next);
 			north.add(previous);
+			north.add(last);
 			north.add(new JLabel());
 			north.add(overlay);
 			north.add(viewCollitions);
@@ -267,6 +286,7 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 			add(new JLabel(),BorderLayout.CENTER);
 			next.addActionListener(this);
 			previous.addActionListener(this);
+			last.addActionListener(this);
 		}
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -275,6 +295,9 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 			}
 			else if (e.getSource() == previous){
 				gameLoop.previousLevel();
+			}
+			else if (e.getSource() == last){
+				gameLoop.lastLevel();
 			}
 		}
 	}

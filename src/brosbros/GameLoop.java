@@ -12,7 +12,9 @@ public class GameLoop extends Thread{
 	PlayerObject player2;
 	PlayerObject player3;
 	PlayerObject[] players;
+	BossObject boss1;
 	Door door;
+	Key key;
 	Portal portal1;
 	Portal portal2;
 	int gravitystep = 4;
@@ -36,11 +38,13 @@ public class GameLoop extends Thread{
 		player1 = new PlayerObject(this,1,"Frode");
 		player2 = new PlayerObject(this,2,"Fritjof");
 		player3 = new PlayerObject(this,3,"Liv");
+		boss1 = new BossObject(this,1,"Blacho");
 		players = new PlayerObject[nrOfPlayers];
 		players[0] = player1;
 		if (nrOfPlayers >= 2) players[1] = player2;
 		if (nrOfPlayers >= 3) players[2] = player3;
 		door = new Door();
+		key = new Key();
 		portal1 = new Portal(false);
 		portal2 = new Portal(true);
 		//level = new GameOverScreen(this); //For debugging of GameOverScreen
@@ -57,7 +61,10 @@ public class GameLoop extends Thread{
 				if (nextLevelCounter == 0){
 					for (PlayerObject player : players){
 						move(player);
-						if (player.enters(door)) nextLevelCounter = 1;
+						if (player.enters(level,door)) nextLevelCounter = 1;
+						else if (level.numberofkeys > 0 && player.enters(null, key)){
+							level.numberofkeys--;
+						}
 					}
 				}
 				if (nextLevelCounter > 0){
@@ -72,21 +79,33 @@ public class GameLoop extends Thread{
 						player.dying--;
 						if (player.dying == 0 && player.lives > 0){
 							player.lives--;
+							player.hitpoints = PlayerObject.max_hitpoints;
 							player.x = level.getX(player.playerNr);
 							player.y = level.getY(player.playerNr);
 							player.dying = -1;
 						}
 					}
-					else if (player.enters(portal1) && level.portalIsShowing && player.teleportCooldown == 0){
+					else if (player.enters(null,portal1) && level.portalIsShowing && player.teleportCooldown == 0){
 						player.teleport(portal2,false);
 					}
-					else if (player.enters(portal2) && level.portalIsShowing && player.teleportCooldown == 0){
+					else if (player.enters(null,portal2) && level.portalIsShowing && player.teleportCooldown == 0){
 						player.teleport(portal1,true);
+					}
+				}
+				if (level.numberofBosses > 0){
+					boss1.move(level.levelNr);
+					for (PlayerObject player : players){
+						if (player.collidesWith2(boss1)){
+							player.hitpoints--;
+							boss1.shove(player);
+							if (player.hitpoints <= 0) player.dying = 70;
+						}
 					}
 				}
 				if (allPlayersHaveDied){
 					try{
 						for (PlayerObject p : players){
+							p.hitpoints = PlayerObject.max_hitpoints;
 							p.lives = 5;
 							p.dying = -1;
 						}
@@ -274,6 +293,15 @@ public class GameLoop extends Thread{
 				level = new Level(this,level.levelNr-1);
 				gameFrame.repaint();
 			}
+			nextLevelCounter = 0;
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}
+	public void lastLevel() {
+		try{
+			level = new Level(this,Level.maxLevels);
+			gameFrame.repaint();
 			nextLevelCounter = 0;
 		}catch(Exception ex){
 			ex.printStackTrace();
