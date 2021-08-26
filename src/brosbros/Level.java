@@ -25,7 +25,7 @@ public class Level {
 	int bossx = 0; int bossy = 0;
 	int numberofBosses = 0;
 	Color backgroundColor = Color.white;
-	public static int maxLevels = 15;
+	public static int maxLevels = 16;
 	
 	public Level(GameLoop gameLoop, int level) throws Exception{
 		this.levelNr = level;
@@ -177,6 +177,19 @@ public class Level {
 			bossx = 40;
 			bossy = doory-55;
 			numberofBosses = 1;
+		}
+		if (level == 16){
+			startx = 35;
+			starty = 80;
+			doorx = 830;
+			doory = 65;
+			portal1x = 290;
+			portal1y = 440;
+			portal2x = 215;
+			portal2y = 440;
+			portalIsShowing = true;
+			fileName1 = "4-1.png";
+			fileName2 = "4-1.data";
 		}
 		if (fileName1 != null){
 			//Original is 608x472

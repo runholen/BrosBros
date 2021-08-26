@@ -3,6 +3,8 @@ package brosbros;
 import java.awt.Toolkit;
 import java.util.Properties;
 
+import kbxm.XmPlayer;
+
 public class GameLoop extends Thread{
 
 	int nrOfPlayers = 3;
@@ -20,6 +22,7 @@ public class GameLoop extends Thread{
 	int gravitystep = 4;
 	int gamespeed = 20;
 	int nextLevelCounter = 0;
+	XmPlayer xmPlayer = null;
 	
 	public static void main(String[] args) throws Exception {
 		//Doesn't seem to work, as uiscale must be disabled before getScreenSize() is called
@@ -51,6 +54,7 @@ public class GameLoop extends Thread{
 		level = new Intro(this);
 		gameFrame = new GameFrame(this);
 		System.out.println("GameFrame initialized");
+		checkNewMusic();
 	}
 	public void run(){
 		while(true){
@@ -110,6 +114,7 @@ public class GameLoop extends Thread{
 							p.dying = -1;
 						}
 						level = new GameOverScreen(GameLoop.this);
+						checkNewMusic();
 					}catch(Exception ex){
 						ex.printStackTrace();
 					}
@@ -282,6 +287,41 @@ public class GameLoop extends Thread{
 				player.mx = 0; player.my = 0;
 			}
 			nextLevelCounter = 0;
+			checkNewMusic();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}
+
+	private void checkNewMusic() {
+		try{
+			if (level instanceof GameOverScreen){
+				if (xmPlayer != null) xmPlayer.stopNow();
+				xmPlayer = new XmPlayer("gameover.xm",99);
+				xmPlayer.start();
+			}
+			else{
+				int old = xmPlayer==null?-99:xmPlayer.getFileId();
+				int current = 1;
+				String name = "world1music.xm";
+				if (level.levelNr > 0 && level.levelNr % 5 == 0){
+					current = 0; //Spooky
+					name = "spooky.xm";
+				}
+				else if (level.levelNr >= 6 && level.levelNr <= 10){
+					current = 2;
+					name = "world2music.xm";
+				}
+				else if (level.levelNr >= 11 && level.levelNr <= 15){
+					current = 3;
+					name = "world3music.xm";
+				}
+				if (old != current){
+					if (xmPlayer != null) xmPlayer.stopNow();
+					xmPlayer = new XmPlayer(name,current);
+					xmPlayer.start();
+				}
+			}
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
