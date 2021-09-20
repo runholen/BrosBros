@@ -17,22 +17,26 @@ public class Level {
 	int moreUp = 0;
 	int portal1x, portal1y;
 	int portal2x, portal2y;
+	int portal3x, portal3y;
+	int portal4x, portal4y;
 	BufferedImage background = null;
 	byte[][] levelData;
-	boolean portalIsShowing = false;
+	boolean portalPair1IsShowing = false;
+	boolean portalPair2IsShowing = false;
 	boolean isUnderWater = false;
 	int numberofkeys = 0;
 	int bossx = 0; int bossy = 0;
 	int numberofBosses = 0;
 	Color backgroundColor = Color.white;
-	public static int maxLevels = 16;
+	public static int maxLevels = 17;
 	
 	public Level(GameLoop gameLoop, int level) throws Exception{
 		this.levelNr = level;
 		levelData = new byte[608][472];
 		String fileName1 = null;
 		String fileName2 = null;
-		portalIsShowing = false;
+		portalPair1IsShowing = false;
+		portalPair2IsShowing = false;
 		isUnderWater = false;
 		numberofkeys = 0;
 		if (level == 0){
@@ -100,7 +104,7 @@ public class Level {
 			portal1y = 340;
 			portal2x = 1040;
 			portal2y = 620;
-			portalIsShowing = true;
+			portalPair1IsShowing = true;
 			fileName1 = "2-2.png";
 			fileName2 = "2-2.data";
 		}
@@ -187,9 +191,25 @@ public class Level {
 			portal1y = 440;
 			portal2x = 215;
 			portal2y = 440;
-			portalIsShowing = true;
+			portal3x = 590;
+			portal3y = 440;
+			portal4x = 515;
+			portal4y = 440;
+			portalPair1IsShowing = true;
+			portalPair2IsShowing = true;
+			keyx = 400;
+			keyy = 750;
+			numberofkeys = 1;
 			fileName1 = "4-1.png";
 			fileName2 = "4-1.data";
+		}
+		if (level == 17){
+			startx = 175;
+			starty = 230;
+			doorx = 1020;
+			doory = 90;
+			fileName1 = "4-2.png";
+			fileName2 = "4-2.data";
 		}
 		if (fileName1 != null){
 			//Original is 608x472
@@ -220,12 +240,18 @@ public class Level {
 		}
 		gameLoop.door.x = doorx;
 		gameLoop.door.y = doory;
-		gameLoop.key.x = keyx;
-		gameLoop.key.y = keyy;
+		gameLoop.yellowKey.x = keyx;
+		gameLoop.yellowKey.y = keyy;
+		gameLoop.blackKey.x = keyx;
+		gameLoop.blackKey.y = keyy;
 		gameLoop.portal1.x = portal1x;
 		gameLoop.portal1.y = portal1y;
 		gameLoop.portal2.x = portal2x;
 		gameLoop.portal2.y = portal2y;
+		gameLoop.portal3.x = portal3x;
+		gameLoop.portal3.y = portal3y;
+		gameLoop.portal4.x = portal4x;
+		gameLoop.portal4.y = portal4y;
 		gameLoop.boss1.x = bossx;
 		gameLoop.boss1.y = bossy;
 	}

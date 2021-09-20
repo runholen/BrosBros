@@ -14,7 +14,7 @@ public class GameOverScreen extends Intro{
 		messages.add(new IntroMessage(160,60,"We will do better next time",    16,3,-5,300,2,0,Color.white));
 		messages.add(new IntroMessage(220,80,"Please press space to revive us",16,1,-5,0,2,2,Color.white));
 		messages.add(new IntroMessage(300,80,"Me too",                         16,2,-5,0,2,2,Color.white));
-		messages.add(new IntroMessage(380,80,"And me too",                     16,3,-5,0,2,2,Color.white));
+		messages.add(new IntroMessage(380,80,"Me three",                     16,3,-5,0,2,2,Color.white));
 		messages.add(new IntroMessage(200,88,"Press SPACE to restart",35,0,420,1000,0,-10,Color.gray));
 	}
 

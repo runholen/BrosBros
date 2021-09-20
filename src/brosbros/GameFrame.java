@@ -23,7 +23,7 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 	BufferedImage buffer = new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
 	
 	public GameFrame(GameLoop gameLoop) throws Exception{
-		super("BrosBros v0.1.2 snapshot 1");
+		super("BrosBros v0.1.2");
 		BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/resources/"+"icon.png"));
 		setIconImage(img.getScaledInstance(64, 64, BufferedImage.SCALE_DEFAULT));
 		this.gameLoop = gameLoop;
@@ -162,7 +162,8 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 				g.drawImage(gameLoop.door.image,gameLoop.door.x,gameLoop.door.y,null);
 			}
 			if (gameLoop.level.numberofkeys == 1){
-				g.drawImage(gameLoop.key.image,gameLoop.key.x,gameLoop.key.y,null);
+				if (gameLoop.level.levelNr==16) g.drawImage(gameLoop.blackKey.image,gameLoop.blackKey.x,gameLoop.blackKey.y,null);
+				else g.drawImage(gameLoop.yellowKey.image,gameLoop.yellowKey.x,gameLoop.yellowKey.y,null);
 			}
 			if (gameLoop.level.numberofBosses == 1){
 				if (gameLoop.boss1.useFlipped){
@@ -172,9 +173,13 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 					g.drawImage(gameLoop.boss1.image,gameLoop.boss1.x,gameLoop.boss1.y,null);
 				}
 			}
-			if (gameLoop.level.portalIsShowing){
+			if (gameLoop.level.portalPair1IsShowing){
 				g.drawImage(gameLoop.portal1.image,gameLoop.portal1.x,gameLoop.portal1.y,null);
 				g.drawImage(gameLoop.portal2.flipped,gameLoop.portal2.x,gameLoop.portal2.y,null);
+			}
+			if (gameLoop.level.portalPair2IsShowing){
+				g.drawImage(gameLoop.portal3.image, gameLoop.portal3.x, gameLoop.portal3.y,null);
+				g.drawImage(gameLoop.portal4.flipped, gameLoop.portal4.x, gameLoop.portal4.y,null);
 			}
 			if (gameLoop.nextLevelCounter > 0){ //Level complete animation
 				g.setFont(g.getFont().deriveFont((float)gameLoop.nextLevelCounter));

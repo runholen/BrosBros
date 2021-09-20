@@ -16,9 +16,12 @@ public class GameLoop extends Thread{
 	PlayerObject[] players;
 	BossObject boss1;
 	Door door;
-	Key key;
+	Key yellowKey;
+	Key blackKey;
 	Portal portal1;
 	Portal portal2;
+	Portal portal3;
+	Portal portal4;
 	int gravitystep = 4;
 	int gamespeed = 20;
 	int nextLevelCounter = 0;
@@ -47,9 +50,12 @@ public class GameLoop extends Thread{
 		if (nrOfPlayers >= 2) players[1] = player2;
 		if (nrOfPlayers >= 3) players[2] = player3;
 		door = new Door();
-		key = new Key();
-		portal1 = new Portal(false);
-		portal2 = new Portal(true);
+		yellowKey = new Key(false);
+		blackKey = new Key(true);
+		portal1 = new Portal(1,false);
+		portal2 = new Portal(1,true);
+		portal3 = new Portal(2,false);
+		portal4 = new Portal(2,true);
 		//level = new GameOverScreen(this); //For debugging of GameOverScreen
 		level = new Intro(this);
 		gameFrame = new GameFrame(this);
@@ -66,7 +72,7 @@ public class GameLoop extends Thread{
 					for (PlayerObject player : players){
 						move(player);
 						if (player.enters(level,door)) nextLevelCounter = 1;
-						else if (level.numberofkeys > 0 && player.enters(null, key)){
+						else if (level.numberofkeys > 0 && player.enters(null, yellowKey)){
 							level.numberofkeys--;
 						}
 					}
@@ -89,12 +95,19 @@ public class GameLoop extends Thread{
 							player.dying = -1;
 						}
 					}
-					else if (player.enters(null,portal1) && level.portalIsShowing && player.teleportCooldown == 0){
+					else if (player.enters(null,portal1) && level.portalPair1IsShowing && player.teleportCooldown == 0){
 						player.teleport(portal2,false);
 					}
-					else if (player.enters(null,portal2) && level.portalIsShowing && player.teleportCooldown == 0){
+					else if (player.enters(null,portal2) && level.portalPair1IsShowing && player.teleportCooldown == 0){
 						player.teleport(portal1,true);
 					}
+					else if (player.enters(null,portal3) && level.portalPair1IsShowing && player.teleportCooldown == 0){
+						player.teleport(portal4,false);
+					}
+					else if (player.enters(null,portal4) && level.portalPair1IsShowing && player.teleportCooldown == 0){
+						player.teleport(portal3,true);
+					}
+					
 				}
 				if (level.numberofBosses > 0){
 					boss1.move(level.levelNr);
