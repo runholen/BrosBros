@@ -39,6 +39,9 @@ public class Intro extends Level{
 		messages.add(new IntroMessage(540,60,"The theme of world 1 is caves",16,1,0,0,1,0,Color.black));
 		messages.add(new IntroMessage(620,60,"The theme of world 2 is boats",16,2,0,0,1,0,Color.black));
 		messages.add(new IntroMessage(680,60,"The theme of world 3 is islands",16,3,0,0,1,0,Color.black));
+		messages.add(new IntroMessage(760,60,"The theme of world 4 is gravity",16,1,0,0,1,0,Color.black));
+		messages.add(new IntroMessage(840,60,"The theme of world 5 is forests",16,2,0,0,1,0,Color.black));
+		messages.add(new IntroMessage(920,60,"The theme of world 6 is pizza",16,3,0,0,1,0,Color.black));
 	}
 	
 	public class IntroMessage{

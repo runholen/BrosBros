@@ -11,7 +11,8 @@ public class PlayerObject extends GameObject{
 	String playerName;
 	boolean touchingGround = false;
 	int dying = -1;
-	int lives = 4;
+	public static int startLives = 4;
+	int lives;
 	int speedx = 4;
 	int speedy = 7;
 	int floating = 0;
@@ -33,6 +34,8 @@ public class PlayerObject extends GameObject{
 	
 	BufferedImage swimming;
 	BufferedImage swimmingFlipped;
+	BufferedImage upsideDown;
+	BufferedImage upsideDownFlipped;
 	
 	private GameLoop loop;
 	
@@ -48,6 +51,9 @@ public class PlayerObject extends GameObject{
 		flipped = GameFrame.flip(image);
 		swimmingFlipped = GameFrame.rotateClockwise90(image);
 		swimming = GameFrame.flip(swimmingFlipped);
+		upsideDown = GameFrame.rotateClockwise90(swimmingFlipped);
+		upsideDownFlipped = GameFrame.flip(upsideDown);
+		
 		
 		if (playerNr == 1){
 			speedx = 5;
@@ -60,6 +66,7 @@ public class PlayerObject extends GameObject{
 		else if (playerNr == 3){
 			floatValue = 20;
 		}
+		lives = startLives;
 	}
 
 	public void handleInput(Level level){
@@ -72,8 +79,9 @@ public class PlayerObject extends GameObject{
 				my = -1;
 				swimUp = true;
 			}
-			else if (touchingGround && my == 0){
+			else if (touchingGround && my == 0){ //Initialize jump
 				my = -speedy;
+				if (level.lowGravity) my -= 3;
 				gravityCounter = gravityStep;
 				jumping = true;
 			}

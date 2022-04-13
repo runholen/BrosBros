@@ -56,6 +56,7 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 		    String name = InetAddress.getLocalHost().getHostName();
 		    System.out.println(name);
 		    if (name.equalsIgnoreCase("RUNARLAP")) return true;
+		    if (name.equalsIgnoreCase("FRODEMASKIN")) return true;
 		}
 		catch (Exception ex)
 		{
@@ -106,10 +107,12 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 				PlayerObject player = gameLoop.players[t];
 				if (player.useFlipped){ //Player facing left
 					if (gameLoop.level.isUnderWater) g.drawImage(player.swimming, player.x, player.y, null);
+					else if (gameLoop.level.gravitySwapped) g.drawImage(player.upsideDown, player.x, player.y, null);
 					else g.drawImage(player.flipped,player.x,player.y,null);
 				}
 				else{ //The normal player image, facing right
 					if (gameLoop.level.isUnderWater) g.drawImage(player.swimmingFlipped, player.x, player.y, null);
+					else if (gameLoop.level.gravitySwapped) g.drawImage(player.upsideDownFlipped, player.x, player.y, null);
 					else g.drawImage(player.image,player.x,player.y,null);
 				}
 				for (int lives = 0; lives < player.lives; lives++){ //Paint the number of lives left
@@ -158,6 +161,9 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 			else if (gameLoop.level.levelNr == 10){
 				g.drawImage(gameLoop.door.alternateImage2,gameLoop.door.x,gameLoop.door.y,null);				
 			}
+			else if (gameLoop.level.levelNr == 25){
+				g.drawImage(gameLoop.door.alternateImage3,gameLoop.door.x,gameLoop.door.y,null);				
+			}
 			else{
 				g.drawImage(gameLoop.door.image,gameLoop.door.x,gameLoop.door.y,null);
 			}
@@ -165,12 +171,12 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 				if (gameLoop.level.levelNr==16) g.drawImage(gameLoop.blackKey.image,gameLoop.blackKey.x,gameLoop.blackKey.y,null);
 				else g.drawImage(gameLoop.yellowKey.image,gameLoop.yellowKey.x,gameLoop.yellowKey.y,null);
 			}
-			if (gameLoop.level.numberofBosses == 1){
-				if (gameLoop.boss1.useFlipped){
-					g.drawImage(gameLoop.boss1.flipped,gameLoop.boss1.x,gameLoop.boss1.y,null);
+			for (BossObject boss : gameLoop.bosses) {
+				if (boss.useFlipped){
+					g.drawImage(boss.flipped,boss.x,boss.y,null);
 				}
 				else{
-					g.drawImage(gameLoop.boss1.image,gameLoop.boss1.x,gameLoop.boss1.y,null);
+					g.drawImage(boss.image,boss.x,boss.y,null);
 				}
 			}
 			if (gameLoop.level.portalPair1IsShowing){
@@ -191,7 +197,21 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 					g.drawString("Level Complete",GameFrame.width/2-gameLoop.nextLevelCounter*2,GameFrame.height/2-gameLoop.nextLevelCounter/2);
 				}
 			}
-			
+			if (gameLoop.level.maySwapGravity) {
+				if (gameLoop.level.gravitySwapped) {
+					g.setColor(Color.black);
+					g.drawString("SWAPPED", 20, 20);
+				}
+				else {
+					g.setColor(Color.black);
+					g.drawString(""+gameLoop.level.gravitySwapCounter, 20, 20);
+				}
+			}
+			for (Bullet bullet : gameLoop.bullets) {
+				g.drawImage(bullet.image,bullet.x,bullet.y,null);
+				//g.setColor(Color.blue);
+				//g.drawString(bullet.x+","+bullet.y, bullet.x, bullet.y);
+			}
 		}
 		//For debugging
 		private void paintCollition(Graphics g, Collition c, GameObject player, Color color) {
@@ -235,7 +255,7 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 			int x = e.getX()*width/screenWidth;
 			int y = e.getY()*height/screenHeight;
 			if (debugPanel.viewCollitions.isSelected()){
-				clicked = gameLoop.collidesBackground(new GameObject(), x, y);
+				clicked = gameLoop.collidesBackground(new GameObject(), x, y, true);
 			}
 			if (debugPanel.isVisible()){
 				for (PlayerObject player : gameLoop.players){

@@ -26,9 +26,12 @@ public class Level {
 	boolean isUnderWater = false;
 	int numberofkeys = 0;
 	int bossx = 0; int bossy = 0;
-	int numberofBosses = 0;
 	Color backgroundColor = Color.white;
-	public static int maxLevels = 17;
+	boolean lowGravity = false;
+	boolean maySwapGravity = false;
+	boolean gravitySwapped = false;
+	int gravitySwapCounter = 0;
+	public static int maxLevels = 30;
 	
 	public Level(GameLoop gameLoop, int level) throws Exception{
 		this.levelNr = level;
@@ -39,6 +42,9 @@ public class Level {
 		portalPair2IsShowing = false;
 		isUnderWater = false;
 		numberofkeys = 0;
+		maySwapGravity = false;
+		gameLoop.bosses.clear();
+		gameLoop.bullets.clear();
 		if (level == 0){
 			startx = -100;
 			starty = -100;
@@ -178,9 +184,10 @@ public class Level {
 			numberofkeys = 1;
 			fileName1 = "3-5.png";
 			fileName2 = "3-5.data";
-			bossx = 40;
-			bossy = doory-55;
-			numberofBosses = 1;
+			gameLoop.addBoss(1,40,doory-55); //Type, x, y
+			//bossx = 40;
+			//bossy = doory-55;
+			//numberofBosses = 1;
 		}
 		if (level == 16){
 			startx = 35;
@@ -211,12 +218,128 @@ public class Level {
 			fileName1 = "4-2.png";
 			fileName2 = "4-2.data";
 		}
+		if (level == 18){
+			startx = 590;
+			starty = 10;
+			doorx = 1020;
+			doory = 175;
+			fileName1 = "4-3.png";
+			fileName2 = "4-3.data";
+			lowGravity = true;
+		}
+		if (level == 19){
+			startx = 200;
+			starty = 200;
+			doorx = 100;
+			doory = 250;
+			fileName1 = "4-4.png";
+			fileName2 = "4-4.data";
+			maySwapGravity = true;
+		}
+		if (level == 20){
+			startx = 119;
+			starty = -10;
+			doorx = 400;
+			doory = 800;
+			fileName1 = "4-5.png";
+			fileName2 = "4-5.data";
+			lowGravity = true;
+		}
+		if (level == 21){
+			startx = 200;
+			starty = 10;
+			doorx = 1150;
+			doory = 600;
+			fileName1 = "5-1.png";
+			fileName2 = "5-1.data";
+		}
+		if (level == 22){
+			startx = 200;
+			starty = 100;
+			doorx = 1150;
+			doory = 600;
+			fileName1 = "5-2.png";
+			fileName2 = "5-2.data";
+		}
+		if (level == 23){
+			startx = 50;
+			starty = 50;
+			doorx = 1175;
+			doory = 175;
+			fileName1 = "5-3.png";
+			fileName2 = "5-3.data";
+		}
+		if (level == 24){
+			startx = 50;
+			starty = 50;
+			doorx = 1175;
+			doory = 175;
+			fileName1 = "5-4.png";
+			fileName2 = "5-4.data";
+		}
+		if (level == 25){
+			startx = 50;
+			starty = 50;
+			doorx = 1175;
+			doory = 750;
+			fileName1 = "5-5.png";
+			fileName2 = "5-5.data";
+			gameLoop.addBoss(2,500,doory-30); //Type, x, y
+			gameLoop.addBoss(2,700,doory-30); //Type, x, y
+			gameLoop.addBoss(2,900,doory-30); //Type, x, y
+			gameLoop.addBoss(2,1100,doory-30); //Type, x, y
+		}
+		if (level == 26){
+			startx = 50;
+			starty = 25;
+			doorx = 250;
+			doory = 675;
+			fileName1 = "6-1.png";
+			fileName2 = "6-1.data";
+		}
+		if (level == 27){
+			startx = 50;
+			starty = 25;
+			doorx = 500;
+			doory = 250;
+			fileName1 = "6-2.png";
+			fileName2 = "6-2.data";
+			isUnderWater  = true;
+		}
+		if (level == 28){
+			startx = 900;
+			starty = 200;
+			doorx = 600;
+			doory = 350;
+			fileName1 = "6-3.png";
+			fileName2 = "6-3.data";
+		}
+		if (level == 29){
+			startx = 100;
+			starty = 800;
+			doorx = 1100;
+			doory = 700;
+			fileName1 = "6-4.png";
+			fileName2 = "6-4.data";
+		}
+		if (level == 30){
+			startx = 259;
+			starty = 80;
+			doorx = 99;
+			doory = 499;
+			fileName1 = "6-5.png";
+			fileName2 = "6-5.data";
+			maySwapGravity = true;
+			gameLoop.addBoss(3,550,700); //Type, x, y
+		}
+		
 		if (fileName1 != null){
 			//Original is 608x472
 			background = ImageIO.read(getClass().getResourceAsStream("/resources/"+fileName1));
 			//Now it becomes 1216x944
 			background = GameFrame.scale(background);
 		}
+		
 		if (fileName2 != null){
 			InputStream in = getClass().getResourceAsStream("/resources/"+fileName2);
 			byte[] b = new byte[286976]; //608x472
@@ -252,8 +375,8 @@ public class Level {
 		gameLoop.portal3.y = portal3y;
 		gameLoop.portal4.x = portal4x;
 		gameLoop.portal4.y = portal4y;
-		gameLoop.boss1.x = bossx;
-		gameLoop.boss1.y = bossy;
+		//gameLoop.boss1.x = bossx;
+		//gameLoop.boss1.y = bossy;
 	}
 	public int getX(int playerNr){
 		int x = startx;
@@ -261,6 +384,7 @@ public class Level {
 		if (playerNr == 3) x += 90;
 		if (levelNr == 11 && playerNr == 2) x -= 35;
 		if (levelNr == 11 && playerNr == 3) x -= 105;		
+		if (levelNr == 19 && playerNr == 3) x -= 90;
 		return x;
 	}
 	public int getY(int playerNr){

@@ -2,6 +2,7 @@ package brosbros;
 
 import java.awt.Toolkit;
 import java.util.Properties;
+import java.util.Vector;
 
 import kbxm.XmPlayer;
 
@@ -14,7 +15,8 @@ public class GameLoop extends Thread{
 	PlayerObject player2;
 	PlayerObject player3;
 	PlayerObject[] players;
-	BossObject boss1;
+	Vector<BossObject> bosses = new Vector<>();
+	Vector<Bullet> bullets = new Vector<>();
 	Door door;
 	Key yellowKey;
 	Key blackKey;
@@ -43,8 +45,7 @@ public class GameLoop extends Thread{
 	public GameLoop() throws Exception {
 		player1 = new PlayerObject(this,1,"Frode");
 		player2 = new PlayerObject(this,2,"Fritjof");
-		player3 = new PlayerObject(this,3,"Liv");
-		boss1 = new BossObject(this,1,"Blacho");
+		player3 = new PlayerObject(this,3,"Liv");		
 		players = new PlayerObject[nrOfPlayers];
 		players[0] = player1;
 		if (nrOfPlayers >= 2) players[1] = player2;
@@ -75,6 +76,13 @@ public class GameLoop extends Thread{
 						else if (level.numberofkeys > 0 && player.enters(null, yellowKey)){
 							level.numberofkeys--;
 						}
+					}
+				}
+				if (level.maySwapGravity == true) {
+					level.gravitySwapCounter++;
+					if (level.gravitySwapCounter >= 100) {
+						level.gravitySwapped = !level.gravitySwapped;
+						level.gravitySwapCounter = 0;
 					}
 				}
 				if (nextLevelCounter > 0){
@@ -109,21 +117,37 @@ public class GameLoop extends Thread{
 					}
 					
 				}
-				if (level.numberofBosses > 0){
-					boss1.move(level.levelNr);
+				for (BossObject boss : bosses) {
+					boss.move(level.levelNr);
 					for (PlayerObject player : players){
-						if (player.collidesWith2(boss1)){
+						if (player.collidesWith2(boss)){
 							player.hitpoints--;
-							boss1.shove(player);
+							boss.shove(player);
 							if (player.hitpoints <= 0) player.dying = 70;
+						}
+					}
+				}
+				for (int t = 0; t < bullets.size(); t++) {
+					Bullet bullet = bullets.elementAt(t);
+					boolean remove = bullet.move(this);
+					if (remove) {
+						bullets.removeElementAt(t);
+						t--;
+					}
+					else {
+						for (PlayerObject player : players){
+							if (player.collidesWith2(bullet)){
+								player.dying = 70;
+							}
 						}
 					}
 				}
 				if (allPlayersHaveDied){
 					try{
+						PlayerObject.startLives++;
 						for (PlayerObject p : players){
 							p.hitpoints = PlayerObject.max_hitpoints;
-							p.lives = 5;
+							p.lives = PlayerObject.startLives;
 							p.dying = -1;
 						}
 						level = new GameOverScreen(GameLoop.this);
@@ -142,8 +166,10 @@ public class GameLoop extends Thread{
 		player.handleInput(level);
 		player.touchingGround = false;
 		int dy = 0;
+		int gravityDirection = level.gravitySwapped ? -1 : 1;
+		if (player.dying > 0) gravityDirection = 1;
 		int newx = player.x + player.mx;
-		int newy = player.y + player.my;
+		int newy = player.y + player.my * gravityDirection;
 		//if (player.mx != 0 || player.my != 0){
 		//	System.out.println(player.playerNr+": "+player.mx+" "+player.my+" "+(player.ghostCollition!=null));
 		//}
@@ -168,15 +194,18 @@ public class GameLoop extends Thread{
 				if (player.y <= 0) player.my = 0;
 				if (player.swimUp == false) player.my = 1;
 			}
-			else if (player.my > 0){
+			else if (player.my > 0){ //Moving downwards
 				if (level.isUnderWater){
 					player.my = 2;
 				}
 				else{
-					if (player.my == 4) player.my = 5;
-					else if (player.my == 3) player.my = 4;
-					else if (player.my == 2) player.my = 3;
-					else if (player.my == 1) player.my = 2;
+					if (level.lowGravity == true && player.dying == -1) player.my = 2;
+					else{
+						if (player.my == 4) player.my = 5;
+						else if (player.my == 3) player.my = 4;
+						else if (player.my == 2) player.my = 3;
+						else if (player.my == 1) player.my = 2;
+					}
 				}
 			}
 			else if (player.my == 0){
@@ -203,7 +232,7 @@ public class GameLoop extends Thread{
 				}
 			}
 			if (player.my > 0){ //Falling
-				newy = player.y + player.my; //my may be changed, recalculate newy
+				newy = player.y + player.my * gravityDirection; //my may be changed, recalculate newy
 				if (player.isDying() == false){
 					collition = collidesBackground(player,newx,newy);
 					if (collition.onlyLadder() && player.downPressed == false){ //Stop on ladder
@@ -214,26 +243,27 @@ public class GameLoop extends Thread{
 					else if (collition.someCollitionIgnoreLadder()){
 						player.my = 0;
 						player.touchingGround = true;
-						newy = player.y + player.my;
+						newy = player.y + player.my * gravityDirection;
 						collition = collidesBackground(player,newx,newy);		
 					}
 				}
 			}
+			//if (player.playerNr == 1) System.out.println(player.my+" "+player.touchingGround);
 		}
 		else{ //Collition detected
 			//Climbing when moving right
 			if (player.my == 0 && player.mx > 0 && collition.right && collition.bottom){
-				Collition test = collidesBackground(player, newx, newy-4);
+				Collition test = collidesBackground(player, newx, newy-4*gravityDirection);
 				if (test.noCollitionIgnoreLadder()){
-					dy = -player.speedx;
+					dy = -player.speedx*gravityDirection;
 					collition = test;
 				}
 			}
 			//Climbing when moving left
 			if (player.my == 0 && player.mx < 0 && collition.left && collition.bottom){
-				Collition test = collidesBackground(player, newx, newy-4);
+				Collition test = collidesBackground(player, newx, newy-4*gravityDirection);
 				if (test.noCollitionIgnoreLadder()){
-					dy = -player.speedx;
+					dy = -player.speedx*gravityDirection;
 					collition = test;
 				}
 			}
@@ -245,22 +275,26 @@ public class GameLoop extends Thread{
 		}
 		//Now, move the player
 		player.x += player.mx;
-		player.y += player.my+dy;
+		player.y += player.my * gravityDirection + dy;
 		player.previousCollition = collition;
 		//Screen bounds
 		if (player.x < 0) player.x = 0;
 		if (player.x > GameFrame.width - player.getWidth()) player.x = GameFrame.width-player.getWidth();
 		if (player.y > GameFrame.height - player.getHeight()) player.y = GameFrame.height-player.getHeight();
 	}
-	
-	public Collition collidesBackground(GameObject player, int newx, int newy){
+	public Collition collidesBackground(GameObject player, int newx, int newy) {
+		return collidesBackground(player, newx, newy, false);
+	}
+	public Collition collidesBackground(GameObject player, int newx, int newy, boolean debug){
 		Collition collition = new Collition(newx,newy);
-		for (int y = 20; y < player.getHeight(); y++){
+		int starty = level.gravitySwapped?0:20;
+		int endy = level.gravitySwapped?player.getHeight()-20:player.getHeight();
+		for (int y = starty; y < endy; y++){
 			for (int x = 0; x < player.getWidth(); x++){
 				int px = newx + x;
 				int py = newy + y;
 				if (py < 0) py = 0;
-				if (py > gameFrame.height) py = gameFrame.height;
+				if (py > GameFrame.height) py = gameFrame.height;
 				if (px < 0) px = 0;
 				if (px > gameFrame.width-player.getWidth()) px = gameFrame.width-player.getWidth();
 				px = px / 2;
@@ -274,11 +308,19 @@ public class GameLoop extends Thread{
 					collition.ladder = true;
 				}
 				if (level.levelData[px][py] == 1){
-					if (y > 50) collition.bottom = true;
-					if (y < 30) collition.top = true;
 					if (x < 10) collition.left = true;
 					if (x > 30) collition.right = true;
-					if (x >= 10 && x <= 30 && y >= 30 && y <= 50) collition.middle = true;
+					if (level.gravitySwapped) {
+						if (y < 10) collition.bottom = true;
+						if (y > 30) collition.top = true;
+						if (x >= 10 && x <= 30 && y >= 10 && y <= 30) collition.middle = true;
+					}
+					else {
+						if (y > 50) collition.bottom = true;
+						if (y < 30) collition.top = true;
+						if (x >= 10 && x <= 30 && y >= 30 && y <= 50) collition.middle = true;
+					}
+					if (debug) System.out.println(x+" "+y+" "+collition.left+" "+collition.right+" "+collition.bottom+" "+collition.top);
 				}
 			}
 		}
@@ -313,6 +355,11 @@ public class GameLoop extends Thread{
 				xmPlayer = new XmPlayer("gameover.xm",99);
 				xmPlayer.start();
 			}
+			else if (level instanceof GameCompletedScreen){
+				if (xmPlayer != null) xmPlayer.stopNow();
+				xmPlayer = new XmPlayer("victory.xm",99);
+				xmPlayer.start();
+			}
 			else{
 				int old = xmPlayer==null?-99:xmPlayer.getFileId();
 				int current = 1;
@@ -328,6 +375,18 @@ public class GameLoop extends Thread{
 				else if (level.levelNr >= 11 && level.levelNr <= 15){
 					current = 3;
 					name = "world3music.xm";
+				}
+				else if (level.levelNr >= 16 && level.levelNr <= 20){
+					current = 4;
+					name = "world4music.xm";
+				}
+				else if (level.levelNr >= 21 && level.levelNr <= 25){
+					current = 5;
+					name = "world5music.xm";
+				}
+				else if (level.levelNr >= 26 && level.levelNr <= 30){
+					current = 6;
+					name = "world6music.xm";
 				}
 				if (old != current){
 					if (xmPlayer != null) xmPlayer.stopNow();
@@ -359,5 +418,27 @@ public class GameLoop extends Thread{
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
+	}
+	
+	public BossObject createBossObject(int type, int x, int y) throws Exception{
+		BossObject boss = null;
+		if (type == 1) boss = new BossObject(this,1,"Blacho");
+		if (type == 2) boss = new BossObject(this,2,"Blicho");
+		if (type == 3) boss = new BossObject(this,3,"Bluchu");
+		if (type == 4) boss = new BossObject(this,4,"Hatched Blicho");
+		if (type == 5) boss = new BossObject(this,5,"Super Blacho");
+		if (type == 6) boss = new BossObject(this,6,"Super Bluchu");
+		if (boss != null){
+			boss.x = x;
+			boss.y = y;
+			boss.startx = x;
+		}
+		return boss;
+
+	}
+
+	public void addBoss(int type, int x, int y) throws Exception{
+		BossObject boss = createBossObject(type, x, y);
+		if (boss != null) bosses.add(boss);
 	}
 }
