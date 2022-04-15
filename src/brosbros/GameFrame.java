@@ -164,6 +164,9 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 			else if (gameLoop.level.levelNr == 25){
 				g.drawImage(gameLoop.door.alternateImage3,gameLoop.door.x,gameLoop.door.y,null);				
 			}
+			else if (gameLoop.level.levelNr == 30){
+				g.drawImage(gameLoop.door.alternateImage4,gameLoop.door.x,gameLoop.door.y,null);				
+			}
 			else{
 				g.drawImage(gameLoop.door.image,gameLoop.door.x,gameLoop.door.y,null);
 			}
