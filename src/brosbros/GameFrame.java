@@ -5,12 +5,17 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.net.InetAddress;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class GameFrame extends JFrame{ //This class paints to the screen.
+public class GameFrame extends JFrame implements WindowListener{ //This class paints to the screen.
 
 	GameLoop gameLoop;
 	FrodePanel frodePanel;
@@ -27,7 +32,8 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 		BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/resources/"+"icon.png"));
 		setIconImage(img.getScaledInstance(64, 64, BufferedImage.SCALE_DEFAULT));
 		this.gameLoop = gameLoop;
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(this);
 		JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
 		p.add(frodePanel = new FrodePanel(),BorderLayout.CENTER);
@@ -127,8 +133,9 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 				for (int tt = 0; tt < gameLoop.players.length; tt++){
 					if (t == tt) continue;
 					PlayerObject other = gameLoop.players[tt];
-					if (player.isDying()){ //If dying, then shout AAAH!
-						g.setColor(Color.black);
+					if (player.isDying()){ 
+						if (gameLoop.level.levelNr == 35) g.setColor(Color.white);
+						else g.setColor(Color.black);
 						g.setFont(g.getFont().deriveFont(Font.BOLD,(float)14));
 						g.drawString("AAAH!", player.x+player.getWidth()/2-10, player.y-5);
 					}
@@ -166,6 +173,9 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 			}
 			else if (gameLoop.level.levelNr == 30){
 				g.drawImage(gameLoop.door.alternateImage4,gameLoop.door.x,gameLoop.door.y,null);				
+			}
+			else if (gameLoop.level.levelNr == 34){
+				g.drawImage(gameLoop.door.alternateImage5,gameLoop.door.x,gameLoop.door.y,null);				
 			}
 			else{
 				g.drawImage(gameLoop.door.image,gameLoop.door.x,gameLoop.door.y,null);
@@ -215,6 +225,9 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 				//g.setColor(Color.blue);
 				//g.drawString(bullet.x+","+bullet.y, bullet.x, bullet.y);
 			}
+			if (gameLoop.pickupHeart.x > 0) {
+				g.drawImage(gameLoop.pickupHeart.image, gameLoop.pickupHeart.x, gameLoop.pickupHeart.y, null);
+			}
 		}
 		//For debugging
 		private void paintCollition(Graphics g, Collition c, GameObject player, Color color) {
@@ -240,6 +253,19 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 			//System.out.println(e.getKeyCode()+" pressed");
 			for (PlayerObject player : gameLoop.players){
 				player.checkInput(e.getKeyCode(), true);
+			}
+			if (e.getKeyCode() == KeyEvent.VK_L && gameLoop.level.levelNr == 0 && new File("brosbros.save").exists()) {
+				try {
+					BufferedReader in = new BufferedReader(new FileReader("brosbros.save"));
+					String s = in.readLine();
+					in.close();
+					s = s.substring(2);
+					String[] el = s.split(",");
+					gameLoop.setLoadData(Integer.parseInt(el[0]), Integer.parseInt(el[1]), Integer.parseInt(el[2]), Integer.parseInt(el[3]));
+				}catch(Exception ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(this, "Something went wrong loading save-file");
+				}
 			}
 		}
 		@Override
@@ -356,5 +382,45 @@ public class GameFrame extends JFrame{ //This class paints to the screen.
 	    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
 	    graphics2D.drawRenderedImage(src, null);
 	    return dest;
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+	}
+	@Override
+	public void windowClosing(WindowEvent e) {
+		if (gameLoop.level.levelNr <= 0 || gameLoop.level instanceof Intro) System.exit(0);
+		else {
+			int ok = JOptionPane.showConfirmDialog(this, "Do you want to save?");
+			if (ok == JOptionPane.NO_OPTION) System.exit(0);
+			if (ok == JOptionPane.OK_OPTION) {
+				try {
+					File f = new File("brosbros.save");
+					BufferedWriter out = new BufferedWriter(new FileWriter(f));
+					out.write("SV"+gameLoop.level.levelNr+","+gameLoop.player1.lives+","+gameLoop.player2.lives+","+gameLoop.player3.lives);
+					out.flush();
+					out.close();
+				}catch(Exception ex) {
+					ex.printStackTrace();
+				}finally {
+					System.exit(0);
+				}
+			}
+		}
+	}
+	@Override
+	public void windowClosed(WindowEvent e) {
+	}
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+	@Override
+	public void windowActivated(WindowEvent e) {	
+	}
+	@Override
+	public void windowDeactivated(WindowEvent e) {
 	}
 }

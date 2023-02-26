@@ -10,6 +10,7 @@ public class Door extends GameObject{
 	BufferedImage alternateImage2;
 	BufferedImage alternateImage3;
 	BufferedImage alternateImage4;
+	BufferedImage alternateImage5;
 	
 	public Door() throws Exception{
 		image = ImageIO.read(getClass().getResourceAsStream("/resources/door.png"));
@@ -22,5 +23,7 @@ public class Door extends GameObject{
 		alternateImage3 = GameFrame.scale(alternateImage3);
 		alternateImage4 = ImageIO.read(getClass().getResourceAsStream("/resources/rocket.png"));
 		alternateImage4 = GameFrame.scale(alternateImage4);
+		alternateImage5 = ImageIO.read(getClass().getResourceAsStream("/resources/cannon.png"));
+		alternateImage5 = GameFrame.scale(alternateImage5);
 	}
 }

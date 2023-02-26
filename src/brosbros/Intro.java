@@ -1,6 +1,7 @@
 package brosbros;
 
 import java.awt.*;
+import java.io.File;
 import java.util.Vector;
 
 public class Intro extends Level{
@@ -13,6 +14,9 @@ public class Intro extends Level{
 	public Intro(GameLoop gameLoop) throws Exception{
 		super(gameLoop,0);
 		this.loop = gameLoop;
+		if (new File("brosbros.save").exists()) {
+			messages.add(new IntroMessage(0,60,"Press L to load game",24,0,500,800,0,0,Color.black));
+		}
 		if (GameFrame.isDeveloperPc()){
 			messages.add(new IntroMessage(0,60,"Java version: "+System.getProperty("java.version"),10,0,10,800,0,0,Color.gray));
 		}
@@ -42,6 +46,9 @@ public class Intro extends Level{
 		messages.add(new IntroMessage(760,60,"The theme of world 4 is gravity",16,1,0,0,1,0,Color.black));
 		messages.add(new IntroMessage(840,60,"The theme of world 5 is forests",16,2,0,0,1,0,Color.black));
 		messages.add(new IntroMessage(920,60,"The theme of world 6 is pizza",16,3,0,0,1,0,Color.black));
+		messages.add(new IntroMessage(1000,60,"The theme of world 7 is sky and space",16,3,0,0,1,0,Color.black));   
+		messages.add(new IntroMessage(1080,60,"The theme of world 8 is castles",16,2,0,0,1,0,Color.black));
+		messages.add(new IntroMessage(1240,60,"The next update will be the world update",16,1,0,0,1,0,Color.black));
 	}
 	
 	public class IntroMessage{

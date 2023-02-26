@@ -19,6 +19,7 @@ public class Level {
 	int portal2x, portal2y;
 	int portal3x, portal3y;
 	int portal4x, portal4y;
+	int pickupHeartX, pickupHeartY;
 	BufferedImage background = null;
 	byte[][] levelData;
 	boolean portalPair1IsShowing = false;
@@ -31,7 +32,7 @@ public class Level {
 	boolean maySwapGravity = false;
 	boolean gravitySwapped = false;
 	int gravitySwapCounter = 0;
-	public static int maxLevels = 30;
+	public static int maxLevels = 35;
 	
 	public Level(GameLoop gameLoop, int level) throws Exception{
 		this.levelNr = level;
@@ -56,6 +57,8 @@ public class Level {
 			starty = 750;
 			doorx = 380;
 			doory = 8;
+			pickupHeartX = 480;
+			pickupHeartY = 700;
 			fileName1 = "1-1.png";
 			fileName2 = "1-1.data";
 		}
@@ -98,6 +101,8 @@ public class Level {
 			starty = GameFrame.height-130;
 			doorx = 462;
 			doory = GameFrame.height-910;
+			pickupHeartX = 730;
+			pickupHeartY = 700;
 			fileName1 = "2-1.png";
 			fileName2 = "2-1.data";
 		}
@@ -145,6 +150,8 @@ public class Level {
 			doory = 800;
 			fileName1 = "3-1.png";
 			fileName2 = "3-1.data";
+			pickupHeartX = 480;
+			pickupHeartY = 700;
 		}
 		if (level == 12){
 			startx = 80;
@@ -194,6 +201,8 @@ public class Level {
 			starty = 80;
 			doorx = 830;
 			doory = 65;
+			pickupHeartX = 730;
+			pickupHeartY = 700;
 			portal1x = 290;
 			portal1y = 440;
 			portal2x = 215;
@@ -246,6 +255,8 @@ public class Level {
 			lowGravity = true;
 		}
 		if (level == 21){
+			pickupHeartX = 720;
+			pickupHeartY = 380;
 			startx = 200;
 			starty = 10;
 			doorx = 1150;
@@ -296,6 +307,8 @@ public class Level {
 			doory = 675;
 			fileName1 = "6-1.png";
 			fileName2 = "6-1.data";
+			pickupHeartX = 700;
+			pickupHeartY = 790;
 		}
 		if (level == 27){
 			startx = 50;
@@ -332,7 +345,49 @@ public class Level {
 			maySwapGravity = true;
 			gameLoop.addBoss(3,550,700); //Type, x, y
 		}
-		
+		if (level == 31){
+			startx = 200;
+			starty = 450;
+			doorx = 1000;
+			doory = 450;
+			fileName1 = "7-1.png";
+			fileName2 = "7-1.data";
+			pickupHeartX = 1135;
+			pickupHeartY = 575;
+		}
+		if (level == 32){
+			startx = 1100;
+			starty = 100;
+			doorx = 1100;
+			doory = 808;
+			fileName1 = "7-2.png";
+			fileName2 = "7-2.data";
+		}
+		if (level == 33){
+			startx = 200;
+			starty = 150;
+			doorx = 100;
+			doory = 808;
+			fileName1 = "7-3.png";
+			fileName2 = "7-3.data";
+		}
+		if (level == 34){
+			startx = 200;
+			starty = 150;
+			doorx = 1100;
+			doory = 70;
+			fileName1 = "7-4.png";
+			fileName2 = "7-4.data";
+		}
+		if (level == 35){
+			startx = 200;
+			starty = 150;
+			doorx = 1100;
+			doory = 750;
+			fileName1 = "7-5.png";
+			fileName2 = "7-5.data";
+			isUnderWater  = true;
+		}
 		if (fileName1 != null){
 			//Original is 608x472
 			background = ImageIO.read(getClass().getResourceAsStream("/resources/"+fileName1));
@@ -375,6 +430,8 @@ public class Level {
 		gameLoop.portal3.y = portal3y;
 		gameLoop.portal4.x = portal4x;
 		gameLoop.portal4.y = portal4y;
+		gameLoop.pickupHeart.x = pickupHeartX;
+		gameLoop.pickupHeart.y = pickupHeartY;
 		//gameLoop.boss1.x = bossx;
 		//gameLoop.boss1.y = bossy;
 	}

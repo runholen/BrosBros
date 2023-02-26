@@ -24,6 +24,7 @@ public class GameLoop extends Thread{
 	Portal portal2;
 	Portal portal3;
 	Portal portal4;
+	PickupHeart pickupHeart;
 	int gravitystep = 4;
 	int gamespeed = 20;
 	int nextLevelCounter = 0;
@@ -57,6 +58,7 @@ public class GameLoop extends Thread{
 		portal2 = new Portal(1,true);
 		portal3 = new Portal(2,false);
 		portal4 = new Portal(2,true);
+		pickupHeart = new PickupHeart();
 		//level = new GameOverScreen(this); //For debugging of GameOverScreen
 		level = new Intro(this);
 		gameFrame = new GameFrame(this);
@@ -114,6 +116,11 @@ public class GameLoop extends Thread{
 					}
 					else if (player.enters(null,portal4) && level.portalPair1IsShowing && player.teleportCooldown == 0){
 						player.teleport(portal3,true);
+					}
+					else if (player.collidesWith2(pickupHeart) && pickupHeart.x > 0) {
+						player.lives++;
+						pickupHeart.x = 0; 
+						pickupHeart.y = 0;
 					}
 					
 				}
@@ -328,6 +335,24 @@ public class GameLoop extends Thread{
 		return collition;
 	}
 	
+	public void setLoadData(int levelNr, int player1Lives, int player2Lives, int player3Lives) {
+		try {
+			level = new Level(this,levelNr);
+			gameFrame.repaint();
+			for (PlayerObject player : players){
+				player.mx = 0; player.my = 0;
+				if (player.playerNr == 1) player.lives = player1Lives;
+				if (player.playerNr == 2) player.lives = player2Lives;
+				if (player.playerNr == 3) player.lives = player3Lives;
+			}
+			nextLevelCounter = 0;
+			checkNewMusic();
+
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	public void nextLevel() {
 		try{
 			if (level.levelNr < Level.maxLevels){
@@ -364,7 +389,11 @@ public class GameLoop extends Thread{
 				int old = xmPlayer==null?-99:xmPlayer.getFileId();
 				int current = 1;
 				String name = "world1music.xm";
-				if (level.levelNr > 0 && level.levelNr % 5 == 0){
+				if (level.levelNr < 35 && level.levelNr > 0 && level.levelNr % 5 == 0){
+					current = 0; //Spooky
+					name = "spooky.xm";
+				}
+				else if (level.levelNr == 36 || level.levelNr == 43 || level.levelNr == 51) {
 					current = 0; //Spooky
 					name = "spooky.xm";
 				}
@@ -388,6 +417,18 @@ public class GameLoop extends Thread{
 					current = 6;
 					name = "world6music.xm";
 				}
+				else if (level.levelNr >= 31 && level.levelNr <= 36){
+					current = 7;
+					name = "world7music.xm";
+				}
+				else if (level.levelNr >= 37 && level.levelNr <= 43){
+					current = 8;
+					name = "spooky.xm";
+				}
+				else if (level.levelNr >= 44 && level.levelNr <= 51){
+					current = 9;
+					name = "world9music.xm";
+				}
 				if (old != current){
 					if (xmPlayer != null) xmPlayer.stopNow();
 					xmPlayer = new XmPlayer(name,current);
@@ -406,6 +447,7 @@ public class GameLoop extends Thread{
 				gameFrame.repaint();
 			}
 			nextLevelCounter = 0;
+			checkNewMusic();
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
@@ -415,6 +457,7 @@ public class GameLoop extends Thread{
 			level = new Level(this,Level.maxLevels);
 			gameFrame.repaint();
 			nextLevelCounter = 0;
+			checkNewMusic();
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
