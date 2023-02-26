@@ -127,7 +127,7 @@ public class GameLoop extends Thread{
 				for (BossObject boss : bosses) {
 					boss.move(level.levelNr);
 					for (PlayerObject player : players){
-						if (player.collidesWith2(boss)){
+						if (player.collidesWith2(boss) && nextLevelCounter <= 0){
 							player.hitpoints--;
 							boss.shove(player);
 							if (player.hitpoints <= 0) player.dying = 70;

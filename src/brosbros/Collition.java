@@ -34,5 +34,14 @@ public class Collition {
 			noCollition = false;
 		}
 	}
+	
+	public static Collition getDebugCollition(int x, int y) {
+		Collition c = new Collition(x,y);
+		c.left = true;
+		c.right = true;
+		c.top = true;
+		c.bottom = true;
+		return c;
+	}
 }
 ;

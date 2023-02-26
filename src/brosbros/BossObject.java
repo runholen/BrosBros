@@ -22,10 +22,11 @@ public class BossObject extends GameObject{
 		if (bossNr == 5) fileName = "super blacho.png";
 		if (bossNr == 6) fileName = "super bluchu.png";
 		image = ImageIO.read(getClass().getResourceAsStream("/resources/"+fileName));
-		image = GameFrame.scale(image);
-		flipped = GameFrame.flip(image);
 		width = image.getWidth()*2;
 		height = image.getHeight()*2;
+		image = GameFrame.scale(image); //Scaling must happen after setting width and height
+		flipped = GameFrame.flip(image);
+		System.out.println("Boss dimensions: "+width+" "+height);
 	}
 
 	public void move(int levelNr) {

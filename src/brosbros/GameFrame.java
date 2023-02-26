@@ -130,7 +130,7 @@ public class GameFrame extends JFrame implements WindowListener{ //This class pa
 					//paintCollition(g,player.previousCollition,player,Color.red);
 					paintCollition(g,player.ghostCollition,player,new Color(255,255,0,150));
 				}
-				for (int tt = 0; tt < gameLoop.players.length; tt++){
+				for (int tt = 0; tt < gameLoop.players.length; tt++){ //Check vs the other players
 					if (t == tt) continue;
 					PlayerObject other = gameLoop.players[tt];
 					if (player.isDying()){ 
@@ -190,6 +190,10 @@ public class GameFrame extends JFrame implements WindowListener{ //This class pa
 				}
 				else{
 					g.drawImage(boss.image,boss.x,boss.y,null);
+				}
+				if (debugPanel.viewCollitions.isSelected()){ //Debug
+					//paintCollition(g,player.previousCollition,player,Color.red);
+					paintCollition(g,Collition.getDebugCollition(boss.x, boss.y), boss,new Color(255,255,0,150));
 				}
 			}
 			if (gameLoop.level.portalPair1IsShowing){
